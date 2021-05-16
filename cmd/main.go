@@ -11,7 +11,7 @@ func main() {
 
 	s := mapstorage.NewStorage()
 
-	go server.StartServer()
+	go server.StartServer(s)
 
 	client.StartClient(s)
 }

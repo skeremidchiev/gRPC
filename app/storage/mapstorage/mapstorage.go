@@ -48,9 +48,13 @@ func (ms *MapStorage) GetRandom() (string, error) {
 	return keys[rand.Intn(len(keys))].Interface().(string), nil
 }
 
-func (ms *MapStorage) GetAll() []string {
+func (ms *MapStorage) GetAll() ([]string, error) {
 	ms.RLock()
 	defer ms.RUnlock()
+
+	if len(ms.storage) == 0 {
+		return nil, errors.New("[MapStorage] Empty storage!")
+	}
 
 	result := make([]string, len(ms.storage))
 	keys := reflect.ValueOf(ms.storage).MapKeys()
@@ -59,7 +63,7 @@ func (ms *MapStorage) GetAll() []string {
 		result = append(result, value.Interface().(string))
 	}
 
-	return result
+	return result, nil
 }
 
 func (ms *MapStorage) exists(value string) bool {
