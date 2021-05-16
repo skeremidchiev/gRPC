@@ -21,20 +21,20 @@ func callCreate(cl comm.CommServiceClient) {
 		Body: RandString(),
 	}
 
-	log.Infof("[Client] calls Create() with message body: %s\n", message.Body)
+	log.Infof("[Client Create()] call with message body: %s\n", message.Body)
 	response, err := cl.Create(context.Background(), &message)
 	if err != nil {
-		log.Warningf("[Client] server responded to Create() with error: %s\n", err.Error())
+		log.Warningf("[Client Create()] server responded with error: %s\n", err.Error())
 		return
 	}
 
-	log.Infof("[Client] server responded to Create():\n\tstatus: %s\n\terror: %s\n", response.Status, response.Error)
+	log.Infof("[Client Create()] server responded:\n\tstatus: %t\n\terror: %s\n", response.Status, response.Error)
 }
 
 func callRemove(cl comm.CommServiceClient, cs storage.ClientStorage) {
 	value, err := cs.GetRandom()
 	if err != nil {
-		log.Warningf("[Client] Error during Remove(): %s\n", err.Error())
+		log.Warningf("[Client Remove()] error: %s\n", err.Error())
 		return
 	}
 
@@ -42,21 +42,21 @@ func callRemove(cl comm.CommServiceClient, cs storage.ClientStorage) {
 		Body: value,
 	}
 
-	log.Infof("[Client] calls Remove() with message body: %s\n", message.Body)
+	log.Infof("[Client Remove()] call with message body: %s\n", message.Body)
 	response, err := cl.Create(context.Background(), &message)
 	if err != nil {
-		log.Warningf("[Client] server responded to Remove() with error: %s\n", err.Error())
+		log.Warningf("[Client Remove()] server responded with error: %s\n", err.Error())
 		return
 	}
 
-	log.Infof("[Client] server responded to Remove():\n\tstatus: %s\n\terror: %s\n", response.Status, response.Error)
+	log.Infof("[Client Remove()] server responded:\n\tstatus: %s\n\terror: %s\n", response.Status, response.Error)
 }
 
 func callList(cl comm.CommServiceClient) {
-	log.Infof("[Client] calls List()\n")
+	log.Infof("[Client List()]\n")
 	stream, err := cl.List(context.Background(), &comm.EmptyMessage{})
 	if err != nil {
-		log.Warningf("[Client] server responded to List() with error: %s\n", err.Error())
+		log.Warningf("[Client List()] server responded with error: %s\n", err.Error())
 		return
 	}
 
@@ -66,16 +66,16 @@ func callList(cl comm.CommServiceClient) {
 			break
 		}
 		if err != nil {
-			log.Warningf("[Client] server responded to List() with error: %s\n", err.Error())
+			log.Warningf("[Client List()] server responded with error: %s\n", err.Error())
 		}
-		log.Infof("[Client] data: %s\n", data)
+		log.Infof("[Client List()] data: %s\n", data)
 	}
 }
 
 func StartClient(cs storage.ClientStorage) {
 	conn, err := grpc.Dial(":8080", grpc.WithInsecure())
 	if err != nil {
-		log.Fatalf("Failed to connect: %s\n", err)
+		log.Fatalf("[Client] Failed to connect: %s\n", err)
 	}
 
 	defer conn.Close()
