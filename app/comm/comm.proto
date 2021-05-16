@@ -1,0 +1,22 @@
+syntax = "proto3";
+
+package comm;
+option go_package = "github.com/skeremidchiev/gRPC;comm";
+
+message Data {
+  string body = 1;
+}
+
+message EmptyMessage {}
+
+message Reply {
+  string error = 1;
+  bool status = 2;
+}
+
+service CommService {
+  rpc Create(Data) returns (Reply) {}
+  rpc Remove(Data) returns (Reply) {}
+  rpc List(EmptyMessage) returns (stream Data) {}
+}
+
