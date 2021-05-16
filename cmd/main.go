@@ -8,6 +8,7 @@ import (
 
 func main() {
 	setupLogger()
+	setupRandSeed()
 
 	s := mapstorage.NewStorage()
 
