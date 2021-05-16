@@ -67,9 +67,6 @@ func (ms *MapStorage) GetAll() ([]string, error) {
 }
 
 func (ms *MapStorage) exists(value string) bool {
-	ms.RLock()
-	defer ms.RUnlock()
-
 	if _, ok := ms.storage[value]; ok {
 		return true
 	}

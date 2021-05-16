@@ -49,7 +49,7 @@ func callRemove(cl comm.CommServiceClient, cs storage.ClientStorage) {
 		return
 	}
 
-	log.Infof("[Client Remove()] server responded:\n\tstatus: %s\n\terror: %s\n", response.Status, response.Error)
+	log.Infof("[Client Remove()] server responded:\n\tstatus: %t\n\terror: %s\n", response.Status, response.Error)
 }
 
 func callList(cl comm.CommServiceClient) {
@@ -83,8 +83,8 @@ func StartClient(cs storage.ClientStorage) {
 	cl := comm.NewCommServiceClient(conn)
 
 	for {
-		time.Sleep(time.Duration(1+rand.Intn(9)) * time.Second)
-		switch rand.Intn(2) {
+		time.Sleep(time.Duration(1+rand.Intn(1)) * time.Second)
+		switch rand.Intn(3) {
 		case 0:
 			callCreate(cl)
 		case 1:
