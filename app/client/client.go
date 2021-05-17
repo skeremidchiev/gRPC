@@ -50,7 +50,7 @@ func (c *Client) CallRemove() error {
 	}
 
 	log.Infof("[Client Remove()] call with message body: %s\n", message.Body)
-	response, err := c.csc.Create(context.Background(), &message)
+	response, err := c.csc.Remove(context.Background(), &message)
 	if err != nil {
 		log.Warningf("[Client Remove()] server responded with error: %s\n", err.Error())
 		return err
