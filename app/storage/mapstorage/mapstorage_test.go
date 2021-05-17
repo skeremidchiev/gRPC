@@ -58,11 +58,8 @@ func TestGetAll(t *testing.T) {
 		t.Error("GetAll failed with: ", err)
 	}
 
-	for i := 0; i < len(values); i++ {
-		if vs[i] != values[i] {
-			t.Error("Mismatching values")
-			return
-		}
+	if !unorderedEqual(vs, values) {
+		t.Error("Mismatching values")
 	}
 }
 
@@ -103,4 +100,20 @@ func TestGetRandomErrorCase(t *testing.T) {
 	if err == nil {
 		t.Error("GetRandom should fail if storage is empty!")
 	}
+}
+
+func unorderedEqual(first, second []string) bool {
+	if len(first) != len(second) {
+		return false
+	}
+	exists := make(map[string]bool)
+	for _, value := range first {
+		exists[value] = true
+	}
+	for _, value := range second {
+		if !exists[value] {
+			return false
+		}
+	}
+	return true
 }
