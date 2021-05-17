@@ -22,7 +22,7 @@ type Client struct {
 	cc  *grpc.ClientConn
 }
 
-func (c *Client) callCreate() {
+func (c *Client) CallCreate() error {
 	message := comm.Data{
 		Body: RandString(),
 	}
@@ -31,17 +31,18 @@ func (c *Client) callCreate() {
 	response, err := c.csc.Create(context.Background(), &message)
 	if err != nil {
 		log.Warningf("[Client Create()] server responded with error: %s\n", err.Error())
-		return
+		return err
 	}
 
 	log.Infof("[Client Create()] server responded:\n\tstatus: %t\n\terror: %s\n", response.Status, response.Error)
+	return nil
 }
 
-func (c *Client) callRemove() {
+func (c *Client) CallRemove() error {
 	value, err := c.cs.GetRandom()
 	if err != nil {
 		log.Warningf("[Client Remove()] error: %s\n", err.Error())
-		return
+		return err
 	}
 
 	message := comm.Data{
@@ -52,18 +53,19 @@ func (c *Client) callRemove() {
 	response, err := c.csc.Create(context.Background(), &message)
 	if err != nil {
 		log.Warningf("[Client Remove()] server responded with error: %s\n", err.Error())
-		return
+		return err
 	}
 
 	log.Infof("[Client Remove()] server responded:\n\tstatus: %t\n\terror: %s\n", response.Status, response.Error)
+	return nil
 }
 
-func (c *Client) callList() {
+func (c *Client) CallList() error {
 	log.Infof("[Client List()]\n")
 	stream, err := c.csc.List(context.Background(), &comm.EmptyMessage{})
 	if err != nil {
 		log.Warningf("[Client List()] server responded with error: %s\n", err.Error())
-		return
+		return err
 	}
 
 	for {
@@ -76,6 +78,23 @@ func (c *Client) callList() {
 			continue
 		}
 		log.Infof("[Client List()] data: %s\n", data.Body)
+	}
+
+	return nil
+}
+
+func (c *Client) Run() {
+	for {
+		time.Sleep(time.Duration(1+rand.Intn(9)) * time.Second)
+		switch rand.Intn(3) {
+		case 0:
+			c.CallCreate()
+		case 1:
+			c.CallRemove()
+		case 2:
+			c.CallList()
+		default:
+		}
 	}
 }
 
@@ -96,21 +115,6 @@ func NewClient(storage storage.ClientStorage) *Client {
 // Destructor
 func (c *Client) Close() {
 	c.cc.Close()
-}
-
-func (c *Client) Run() {
-	for {
-		time.Sleep(time.Duration(1+rand.Intn(9)) * time.Second)
-		switch rand.Intn(3) {
-		case 0:
-			c.callCreate()
-		case 1:
-			c.callRemove()
-		case 2:
-			c.callList()
-		default:
-		}
-	}
 }
 
 func RandString() string {

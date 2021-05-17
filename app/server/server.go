@@ -2,7 +2,6 @@ package server
 
 import (
 	context "context"
-	"math/rand"
 	"net"
 
 	log "github.com/sirupsen/logrus"
@@ -19,9 +18,10 @@ type Server struct {
 func (s *Server) Create(ctx context.Context, message *comm.Data) (*comm.Reply, error) {
 	log.Infof("[Server Create()] received message: %s\n", message.Body)
 
-	if rand.Intn(9) == 0 {
-		return &comm.Reply{Error: "Random Error", Status: false}, nil
-	}
+	// Random error is commented out because it makes testing inconsistent
+	// if rand.Intn(9) == 0 {
+	// 	return &comm.Reply{Error: "Random Error", Status: false}, nil
+	// }
 
 	err := s.storage.Store(message.Body)
 	if err != nil {
@@ -34,9 +34,10 @@ func (s *Server) Create(ctx context.Context, message *comm.Data) (*comm.Reply, e
 func (s *Server) Remove(ctx context.Context, message *comm.Data) (*comm.Reply, error) {
 	log.Infof("[Server Remove()] received message: %s\n", message.Body)
 
-	if rand.Intn(9) == 0 {
-		return &comm.Reply{Error: "Random Error", Status: false}, nil
-	}
+	// Random error is commented out because it makes testing inconsistent
+	// if rand.Intn(9) == 0 {
+	// 	return &comm.Reply{Error: "Random Error", Status: false}, nil
+	// }
 
 	err := s.storage.Delete(message.Body)
 	if err != nil {
