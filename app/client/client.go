@@ -67,8 +67,9 @@ func callList(cl comm.CommServiceClient) {
 		}
 		if err != nil {
 			log.Warningf("[Client List()] server responded with error: %s\n", err.Error())
+			continue
 		}
-		log.Infof("[Client List()] data: %s\n", data)
+		log.Infof("[Client List()] data: %s\n", data.Body)
 	}
 }
 
@@ -83,7 +84,7 @@ func StartClient(cs storage.ClientStorage) {
 	cl := comm.NewCommServiceClient(conn)
 
 	for {
-		time.Sleep(time.Duration(1+rand.Intn(1)) * time.Second)
+		time.Sleep(time.Duration(1+rand.Intn(9)) * time.Second)
 		switch rand.Intn(3) {
 		case 0:
 			callCreate(cl)

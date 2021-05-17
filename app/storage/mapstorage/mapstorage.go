@@ -56,7 +56,7 @@ func (ms *MapStorage) GetAll() ([]string, error) {
 		return nil, errors.New("[MapStorage] Empty storage!")
 	}
 
-	result := make([]string, len(ms.storage))
+	result := make([]string, 0)
 	keys := reflect.ValueOf(ms.storage).MapKeys()
 
 	for _, value := range keys {

@@ -50,10 +50,11 @@ func (s *Server) Remove(ctx context.Context, message *comm.Data) (*comm.Reply, e
 func (s *Server) List(messages *comm.EmptyMessage, stream comm.CommService_ListServer) error {
 	log.Infof("[Server List()]\n")
 
-	data, err := s.storage.GetAll()
-	if err != nil {
-		return err
-	}
+	// returning error will cause endless loop?
+	data, _ := s.storage.GetAll()
+	// if err != nil {
+	// 	return err
+	// }
 
 	for _, d := range data {
 		if err := stream.Send(&comm.Data{Body: d}); err != nil {
