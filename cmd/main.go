@@ -14,5 +14,7 @@ func main() {
 
 	go server.StartServer(s)
 
-	client.StartClient(s)
+	client := client.NewClient(s)
+	defer client.Close()
+	client.Run()
 }

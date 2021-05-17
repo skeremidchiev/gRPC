@@ -16,13 +16,19 @@ const (
 	letters = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"
 )
 
-func callCreate(cl comm.CommServiceClient) {
+type Client struct {
+	csc comm.CommServiceClient
+	cs  storage.ClientStorage
+	cc  *grpc.ClientConn
+}
+
+func (c *Client) callCreate() {
 	message := comm.Data{
 		Body: RandString(),
 	}
 
 	log.Infof("[Client Create()] call with message body: %s\n", message.Body)
-	response, err := cl.Create(context.Background(), &message)
+	response, err := c.csc.Create(context.Background(), &message)
 	if err != nil {
 		log.Warningf("[Client Create()] server responded with error: %s\n", err.Error())
 		return
@@ -31,8 +37,8 @@ func callCreate(cl comm.CommServiceClient) {
 	log.Infof("[Client Create()] server responded:\n\tstatus: %t\n\terror: %s\n", response.Status, response.Error)
 }
 
-func callRemove(cl comm.CommServiceClient, cs storage.ClientStorage) {
-	value, err := cs.GetRandom()
+func (c *Client) callRemove() {
+	value, err := c.cs.GetRandom()
 	if err != nil {
 		log.Warningf("[Client Remove()] error: %s\n", err.Error())
 		return
@@ -43,7 +49,7 @@ func callRemove(cl comm.CommServiceClient, cs storage.ClientStorage) {
 	}
 
 	log.Infof("[Client Remove()] call with message body: %s\n", message.Body)
-	response, err := cl.Create(context.Background(), &message)
+	response, err := c.csc.Create(context.Background(), &message)
 	if err != nil {
 		log.Warningf("[Client Remove()] server responded with error: %s\n", err.Error())
 		return
@@ -52,9 +58,9 @@ func callRemove(cl comm.CommServiceClient, cs storage.ClientStorage) {
 	log.Infof("[Client Remove()] server responded:\n\tstatus: %t\n\terror: %s\n", response.Status, response.Error)
 }
 
-func callList(cl comm.CommServiceClient) {
+func (c *Client) callList() {
 	log.Infof("[Client List()]\n")
-	stream, err := cl.List(context.Background(), &comm.EmptyMessage{})
+	stream, err := c.csc.List(context.Background(), &comm.EmptyMessage{})
 	if err != nil {
 		log.Warningf("[Client List()] server responded with error: %s\n", err.Error())
 		return
@@ -73,25 +79,35 @@ func callList(cl comm.CommServiceClient) {
 	}
 }
 
-func StartClient(cs storage.ClientStorage) {
-	conn, err := grpc.Dial(":8080", grpc.WithInsecure())
+func NewClient(storage storage.ClientStorage) *Client {
+	connection, err := grpc.Dial(":8080", grpc.WithInsecure())
 	if err != nil {
 		log.Fatalf("[Client] Failed to connect: %s\n", err)
 	}
+	serviceClient := comm.NewCommServiceClient(connection)
 
-	defer conn.Close()
+	return &Client{
+		csc: serviceClient,
+		cs:  storage,
+		cc:  connection,
+	}
+}
 
-	cl := comm.NewCommServiceClient(conn)
+// Destructor
+func (c *Client) Close() {
+	c.cc.Close()
+}
 
+func (c *Client) Run() {
 	for {
 		time.Sleep(time.Duration(1+rand.Intn(9)) * time.Second)
 		switch rand.Intn(3) {
 		case 0:
-			callCreate(cl)
+			c.callCreate()
 		case 1:
-			callRemove(cl, cs)
+			c.callRemove()
 		case 2:
-			callList(cl)
+			c.callList()
 		default:
 		}
 	}
